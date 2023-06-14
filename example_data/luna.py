@@ -37,11 +37,11 @@ def process_seg(path: pathlib.Path, size: Tuple[int, int]):
 
 def load_folder(path: pathlib.Path, size: Tuple[int, int] = (128, 128)):
     data = []
-    for file in sorted(path.glob("*/slice_norm.nii.gz")):
+    for file in sorted(path.glob("*/Test cases")):
         img = process_img(file, size=size)
-        seg_file = pathlib.Path(str(file).replace("slice_norm", "slice_seg24"))
+        seg_file = file.with_suffix(".png")
         seg = process_seg(seg_file, size=size)
-        data.append((img, seg))
+        data.append((img / 255.0, seg))
     return data
 
 
@@ -49,17 +49,17 @@ def require_download_lung():
     dest_folder = pathlib.Path("/tmp/universeg_lung/")
 
     if not dest_folder.exists():
-        tar_url = "https://zenodo.org/record/3723295/files/seg-lungs-LUNA16.zip?download=1"
+        tar_url = "https://www.kaggle.com/datasets/adityamahimkar/iqothnccd-lung-cancer-dataset/download?datasetVersionNumber=2"
         subprocess.run(
             ["curl", tar_url, "--create-dirs", "-o",
-                str(dest_folder/'seg-lungs-LUNA16.zip'),],
+                str(dest_folder/'archive.zip'),],
             stderr=subprocess.DEVNULL,
             check=True,
         )
 
         subprocess.run(
             ["tar", 'xf', str(
-                dest_folder/'seg-lungs-LUNA16.zip'), '-C', str(dest_folder)],
+                dest_folder/'archive.zip'), '-C', str(dest_folder)],
             stderr=subprocess.DEVNULL,
             check=True,
         )
