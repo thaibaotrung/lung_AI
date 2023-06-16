@@ -46,19 +46,19 @@ def load_folder(path: pathlib.Path, size: Tuple[int, int] = (128, 128)):
 
 
 def require_download_lung():
-    dest_folder = pathlib.Path("/tmp/universeg_lung/")
+    dest_folder = pathlib.Path("/tmp/universeg_luna/")
 
     if not dest_folder.exists():
-        tar_url = "https://www.kaggle.com/datasets/adityamahimkar/iqothnccd-lung-cancer-dataset/download?datasetVersionNumber=2"
+        zip_url = "https://www.kaggle.com/datasets/adityamahimkar/iqothnccd-lung-cancer-dataset/download?datasetVersionNumber=2"
         subprocess.run(
-            ["curl", tar_url, "--create-dirs", "-o",
+            ["curl", zip_url, "--create-dirs", "-o",
                 str(dest_folder/'archive.zip'),],
             stderr=subprocess.DEVNULL,
             check=True,
         )
 
         subprocess.run(
-            ["tar", 'xf', str(
+            ["zip", 'xf', str(
                 dest_folder/'archive.zip'), '-C', str(dest_folder)],
             stderr=subprocess.DEVNULL,
             check=True,
