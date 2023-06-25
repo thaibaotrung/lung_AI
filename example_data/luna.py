@@ -61,9 +61,9 @@ def require_download_luna():
 
 
 @dataclass
-class OASISDataset(Dataset):
+class LUNADataset(Dataset):
     split: Literal["support", "test"]
-    label: int
+    label: Optional[Literal["Malignant", "Nodule", "Benign"]] = None
     support_frac: float = 0.7
 
     def __post_init__(self):
@@ -71,7 +71,7 @@ class OASISDataset(Dataset):
         T = torch.from_numpy
         self._data = [(T(x)[None], T(y)) for x, y in load_folder(path)]
         if self.label is not None:
-            self._ilabel = self.label
+            self._ilabel = {"Malignant": 1, "Nodule": 2, "Benign": 0}[self.label]
         self._idxs = self._split_indexes()
 
     def _split_indexes(self):
@@ -87,5 +87,5 @@ class OASISDataset(Dataset):
     def __getitem__(self, idx):
         img, seg = self._data[self._idxs[idx]]
         if self.label is not None:
-            seg = (seg == self._ilabel)[None]
+            seg = seg[self._ilabel][None]
         return img, seg
