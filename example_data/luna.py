@@ -29,9 +29,9 @@ def process_seg(path: pathlib.Path, size: Tuple[int, int]):
 
 def load_folder(path: pathlib.Path, size: Tuple[int, int] = (128, 128)):
     data = []
-    for file in sorted(path.glob("*.mhd")):
+    for file in sorted(path.glob("*.png")):
         img = process_img(file, size=size)
-        seg_file = file.with_suffix(".raw")
+        seg_file = file.with_suffix(".png")
         seg = process_seg(seg_file, size=size)
         data.append((img / 255.0, seg))
     return data
@@ -41,17 +41,17 @@ def require_download_luna():
     dest_folder = pathlib.Path("/tmp/universeg_luna/")
 
     if not dest_folder.exists():
-        zip_url = "https://zenodo.org/record/3723295/files/subset1.zip?download=1"
+        zip_url = "https://www.kaggle.com/datasets/fanbyprinciple/luna-lung-cancer-dataset/download?datasetVersionNumber=2"
         subprocess.run(
             ["curl", zip_url, "--create-dirs", "-o",
-                str(dest_folder/'subset1.zip'),],
+                str(dest_folder/'archive.zip'),],
             stderr=subprocess.DEVNULL,
             check=True,
         )
 
         subprocess.run(
             ["zip", 'xf', str(
-                dest_folder/'subset1.zip'), '-C', str(dest_folder)],
+                dest_folder/'archive.zip'), '-C', str(dest_folder)],
             stderr=subprocess.DEVNULL,
             check=True,
         )
@@ -62,7 +62,7 @@ def require_download_luna():
 
 @dataclass
 class LUNADataset(Dataset):
-    split: Literal["support", "test"]
+    split: Literal["train", "test"]
     label: Optional[Literal["Malignant", "Nodule", "Benign"]] = None
     support_frac: float = 0.7
 
@@ -79,7 +79,7 @@ class LUNADataset(Dataset):
         N = len(self._data)
         p = rng.permutation(N)
         i = int(np.floor(self.support_frac * N))
-        return {"support": p[:i], "test": p[i:]}[self.split]
+        return {"train": p[:i], "test": p[i:]}[self.split]
 
     def __len__(self):
         return len(self._idxs)
