@@ -29,9 +29,9 @@ def process_seg(path: pathlib.Path, size: Tuple[int, int]):
 
 def load_folder(path: pathlib.Path, size: Tuple[int, int] = (128, 128)):
     data = []
-    for file in sorted(path.glob("*.png")):
+    for file in sorted(path.glob("*.mhd")):
         img = process_img(file, size=size)
-        seg_file = file.with_suffix(".png")
+        seg_file = file.with_suffix(".raw")
         seg = process_seg(seg_file, size=size)
         data.append((img / 255.0, seg))
     return data
@@ -41,17 +41,17 @@ def require_download_luna():
     dest_folder = pathlib.Path("/tmp/universeg_luna/")
 
     if not dest_folder.exists():
-        zip_url = "https://www.kaggle.com/datasets/fanbyprinciple/luna-lung-cancer-dataset/download?datasetVersionNumber=2"
+        zip_url = "https://zenodo.org/record/3723295/files/subset1.zip?download=1"
         subprocess.run(
             ["curl", zip_url, "--create-dirs", "-o",
-                str(dest_folder/'archive.zip'),],
+                str(dest_folder/'subset1.zip'),],
             stderr=subprocess.DEVNULL,
             check=True,
         )
 
         subprocess.run(
             ["zip", 'xf', str(
-                dest_folder/'archive.zip'), '-C', str(dest_folder)],
+                dest_folder/'subset.zip'), '-C', str(dest_folder)],
             stderr=subprocess.DEVNULL,
             check=True,
         )
