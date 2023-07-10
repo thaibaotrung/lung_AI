@@ -12,6 +12,7 @@ import nibabel as nib
 import PIL
 import torch
 from torch.utils.data import Dataset
+from typing import Literal, Optional, Tuple
 
 
 def process_img(path: pathlib.Path, size: Tuple[int, int]):
@@ -66,7 +67,7 @@ def require_download_luna():
 @dataclass
 class LUNADataset(Dataset):
     split: Literal["support", "test"]
-    label: int
+    label: Optional[Literal["Nodule", "Bengin", "background"]] = None
     support_frac: float = 0.7
 
     def __post_init__(self):
@@ -74,7 +75,7 @@ class LUNADataset(Dataset):
         T = torch.from_numpy
         self._data = [(T(x)[None], T(y)) for x, y in load_folder(path)]
         if self.label is not None:
-            self._ilabel = self.label
+            self._ilabel = {"cytoplasm": 1, "nucleus": 2, "background": 0}[self.label]
         self._idxs = self._split_indexes()
 
     def _split_indexes(self):
@@ -90,5 +91,5 @@ class LUNADataset(Dataset):
     def __getitem__(self, idx):
         img, seg = self._data[self._idxs[idx]]
         if self.label is not None:
-            seg = (seg == self._ilabel)[None]
+            seg = seg[self._ilabel][None]
         return img, seg
