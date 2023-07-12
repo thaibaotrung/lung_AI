@@ -75,7 +75,7 @@ class LUNADataset(Dataset):
         T = torch.from_numpy
         self._data = [(T(x)[None], T(y)) for x, y in load_folder(path)]
         if self.label is not None:
-            self._ilabel = {"cytoplasm": 1, "nucleus": 2, "background": 0}[self.label]
+            self._ilabel = {"Nodule": 1, "Bengin": 2, "background": 0}[self.label]
         self._idxs = self._split_indexes()
 
     def _split_indexes(self):
